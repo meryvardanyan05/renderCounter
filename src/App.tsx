@@ -1,74 +1,31 @@
-import React from "react";
-import "./styles.css";
+import { useState } from "react";
+import { CApp } from "./components/class-components/CApp";
+import { FApp } from "./components/functional-components/FApp";
 
-interface IDataRecord {
-  label: string; // uniq
-  value: number;
+enum ComponentType {
+  Functional = "Functional",
+  Class = "Class",
 }
 
-interface IAppProps {
-  size?: number;
-}
+const App = () => {
+  const [componentType, setComponentType] = useState(ComponentType.Class);
 
-export default class App extends React.Component<
-  IAppProps,
-  { list: IDataRecord[]; }
-> {
-  state = {
-    list: Array.from({ length: this.props.size ?? 200 }, (_el, index) => ({
-      label: `label ${index + 1}`,
-      value: App.generateValue()
-    }))
+  const rootApp = componentType === ComponentType.Class ? <CApp /> : <FApp />;
+
+  const handleChangeType = () => {
+    if (componentType === ComponentType.Class)
+      setComponentType(ComponentType.Functional);
+    else setComponentType(ComponentType.Class);
   };
+  return (
+    <div>
+      <button onClick={handleChangeType}>Switch</button>
 
-  static generateValue() {
-    return Math.round(100 + Math.random() * 900);
-  }
+      {rootApp}
+      <CApp />
+      <FApp />
+    </div>
+  );
+};
 
-  handleUpdate = (index: number) => {
-    this.state.list[index].value = App.generateValue();
-  };
-
-  render() {
-    return (
-      <div>
-        <h1>Test app</h1>
-        {this.state.list.map((el, index) => (
-          <Row data={el} index={index} onUpdate={this.handleUpdate} />
-        ))}
-      </div>
-    );
-  }
-}
-
-interface IRowProps {
-  data: unknown; // TODO
-  index: number;
-  onUpdate: (index: number) => void;
-}
-
-class Row extends React.Component<IRowProps> {
-  renderCount = 0;
-
-  handleUpdate = () => {
-    this.props.onUpdate(this.props.index);
-  };
-
-  render() {
-    const {
-      data: { label, value }
-    } = this.props;
-
-    this.renderCount++;
-
-    return (
-      <div>
-        <span className="label">{label}:</span>
-        <span>{value}</span> <span>({this.renderCount})</span>{" "}
-        <button className="button" onClick={this.handleUpdate}>
-          Update
-        </button>
-      </div>
-    );
-  }
-}
+export default App;
